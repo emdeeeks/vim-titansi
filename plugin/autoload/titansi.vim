@@ -62,4 +62,3 @@ au BufReadPre *.asc call <SID>init()
 au BufReadPost *.asc call <SID>deinit()
 au BufReadPre *.xbin call <SID>init()
 au BufReadPost *.xbin call <SID>deinit()
-
