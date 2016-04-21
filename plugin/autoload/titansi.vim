@@ -13,20 +13,25 @@ func! s:init(...)
     " set file encoding
     call SetFileEncodings('cp437')
 
+    syntax off
+    setlocal virtualedit=all
+    setlocal cc=80
+    hi ColorColumn ctermbg=8 guibg=8
+
     " reset terminal colors to ansi colors
     " this will be diiiiiiirty and should maybe be in a function, or script
-    " echo -en "\e]P0151515" #black
-    " echo -en "\e]P1cc6666" #darkred
-    " echo -en "\e]P2B5BD68" #darkgreen
-    " echo -en "\e]P3F0C674" #brown
-    " echo -en "\e]P481A2BE" #darkblue
-    " echo -en "\e]P5B294BB" #darkmagenta
-    " echo -en "\e]P68ABEB7" #darkcyan
-    " echo -en "\e]P7CCCCCC" #lightgrey
-    " echo -en "\e]P8969896" #darkgrey
-    " echo -en "\e]P9cc6666" #red
-    " echo -en "\e]PAB5BD68" #green
-    " echo -en "\e]PBf0c674" #yellow
+    silent! execute 'x-terminal-emulator -e \e]P0151515' "black
+    silent! execute '\e]P1cc6666' "darkred
+    silent! execute '\e]P2B5BD68' "darkgreen
+    silent! execute '\e]P3F0C674' "brown
+    silent! execute '\e]P481A2BE' "darkblue
+    silent! execute '\e]P5B294BB' "darkmagenta
+    silent! execute '\e]P68ABEB7' "darkcyan
+    silent! execute '\e]P7CCCCCC' "lightgrey
+    silent! execute '\e]P8969896' "darkgrey
+    silent! execute 'x-terminal-emulator -e \e]P9cc6666' "red
+    silent! execute '\e]PAB5BD68' "green
+    silent! execute '\e]PBf0c674' "yellow
     " echo -en "\e]PC81A2BE" #blue
     " echo -en "\e]PDB294BB" #magenta
     " echo -en "\e]PE8ABEB7" #cyan
@@ -40,18 +45,31 @@ func! s:init(...)
     setlocal ambiwidth=single
     setlocal cc=80
     setlocal textwidth=80
+    let no_plugin_maps = 1
 
-    " call AnsiEsc() method in AnsiEsc plugin
-     "call AnsiEsc()
+    if exists("g:loaded_AnsiEscPlugin")
+        silent! execute 'AnsiEsc'
+    endif
 
-    " set virtualedit
-    setlocal virtualedit=all
-    "autocmd BufWritePre * :%s/\s\+$//e
+    " does this help?"
+    autocmd BufWritePre * :%s/\s\+$//e
 endfunction
 
 func! s:deinit(...)
-    " set users terminal colors back to their originals
+    " set users terminal colors back to their originals!!!
+
+    " restore file encodings
     call RestoreFileEncodings()
+endfunction
+
+function! SetFileEncodings(encodings)
+    let b:myfileencodingsbak=&fileencodings
+    let &fileencodings=a:encodings
+endfunction
+
+function! RestoreFileEncodings()
+    let &fileencodings=b:myfileencodingsbak
+    unlet b:myfileencodingsbak
 endfunction
 
 au BufReadPre *.ans call <SID>init()
