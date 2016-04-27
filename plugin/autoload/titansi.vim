@@ -72,6 +72,19 @@ function! RestoreFileEncodings()
     unlet b:myfileencodingsbak
 endfunction
 
+" put this into something useful!!!!
+function s:ReplaceInsertModeWithReplace()
+    if v:insertmode isnot# 'r'
+        call feedkeys("\R", "n")
+    endif
+endfunction
+
+"augroup ForbidInsertMode
+"    autocmd!
+"    autocmd ReplaceEnter  * call ReplaceInsertModeWithReplace()
+"    autocmd ReplaceChange * call ReplaceInsertModeWithReplace()
+"augroup END
+
 au BufReadPre *.ans call <SID>init()
 au BufReadPost *.ans call <SID>deinit()
 au BufReadPre *.nfo call <SID>init()
