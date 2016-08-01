@@ -4,23 +4,79 @@ if exists("g:loaded_vim-titansi") || &cp
   finish
 endif
 
+func! SetUp(...)
+    call SetTerminalColors()
+    call SetFileEncodings('cp437')
+    call SetFormattingOptions()
+    call LoadAnsiEsc()
+    call SetUpControlsBar()
+    call ParseSauce()
+endfunction
+
+func! TearDown(...)
+    call RestoreTerminalColors()
+    call RestoreFileEncodings()
+endfunction
+
+
 func! s:init(...)
+    call SetUp()
     " need to add conditional stuff here for various file formats
 
     " need to parse SAUCE info
     " ref: http://www.acid.org/info/sauce/sauce.htm
 
-    " set file encoding
-    call SetFileEncodings('cp437')
+    " set width to 80. ditch wrapping
 
-    syntax off
-    setlocal virtualedit=all
-    setlocal cc=80
-    hi ColorColumn ctermbg=8 guibg=8
+    " does this help?"
+    autocmd BufWritePre * :%s/\s\+$//e
+endfunction
 
-    " reset terminal colors to ansi colors
-    " this will be diiiiiiirty and should maybe be in a function, or script
-    silent! execute 'x-terminal-emulator -e \e]P0151515' "black
+func! s:deinit(...)
+    " set users terminal colors back to their originals!!!
+
+    " restore file encodings
+endfunction
+
+
+"put this into something useful!!!!
+function s:ReplaceInsertModeWithReplace()
+    if v:insertmode isnot# 'r'
+        call feedkeys("\R", "n")
+    endif
+endfunction
+
+"augroup ForbidInsertMode
+"    autocmd!
+"    autocmd ReplaceEnter  * call ReplaceInsertModeWithReplace()
+"    autocmd ReplaceChange * call ReplaceInsertModeWithReplace()
+"augroup END
+
+au BufReadPre *.ans call SetUp()
+au BufReadPost *.ans call TearDown()
+au BufReadPre *.nfo call <SID>init()
+au BufReadPost *.nfo call <SID>deinit()
+au BufReadPre *.asc call SetUp()
+au BufReadPost *.asc call TearDown()
+au BufReadPre *.xbin call <SID>init()
+au BufReadPost *.xbin call <SID>deinit()
+
+func! SetTerminalColors(...)
+    "Before setting these, they need to be saved somehow!
+
+    call system('echo \x1b]4;1;#AD0000\007') "red
+    call system('echo \x1b]4;9;#FF5255\007') "red
+    ! "\x1b]4;10;#52FF52\007"); "green
+    ! "\x1b]4;11;#FFFF52\007"); "yellow
+    ! "\x1b]4;12;#5255FF\007"); "blue
+    ! "\x1b]4;13;#FF55FF\007"); "magenta
+    ! "\x1b]4;14;#52FFFF\007"); "cyan
+    ! "\x1b]4;15;#FFFFFF\007"); "white
+
+
+    ":call system('chmod +x ' . shellescape(fname))
+
+    ":call system('chmod +x ' . shellescape())
     silent! execute '\e]P1cc6666' "darkred
     silent! execute '\e]P2B5BD68' "darkgreen
     silent! execute '\e]P3F0C674' "brown
@@ -36,30 +92,22 @@ func! s:init(...)
     " echo -en "\e]PDB294BB" #magenta
     " echo -en "\e]PE8ABEB7" #cyan
     " echo -en "\e]PFf5f5f5" #white
-
-    " set width to 80. ditch wrapping
-    setlocal textwidth=80
-    setlocal wrapmargin=2
-    setlocal wrap
-    setlocal columns=80
-    setlocal ambiwidth=single
-    setlocal cc=80
-    setlocal textwidth=80
-    let no_plugin_maps = 1
-
-    if exists("g:loaded_AnsiEscPlugin")
-        silent! execute 'AnsiEsc'
-    endif
-
-    " does this help?"
-    autocmd BufWritePre * :%s/\s\+$//e
 endfunction
 
-func! s:deinit(...)
-    " set users terminal colors back to their originals!!!
+func! SetFormattingOptions()
+    syntax off
+    setlocal virtualedit=all
+    hi ColorColumn ctermbg=8 guibg=8
+"    setlocal wrapmargin=2
+"    setlocal wrap
+    setlocal columns=80
+    setlocal ambiwidth=single
+"    setlocal cc=81
+    setlocal textwidth=80
+    let no_plugin_maps = 1
+endfunction
 
-    " restore file encodings
-    call RestoreFileEncodings()
+func! RestoreTerminalColors(...)
 endfunction
 
 function! SetFileEncodings(encodings)
@@ -72,25 +120,23 @@ function! RestoreFileEncodings()
     unlet b:myfileencodingsbak
 endfunction
 
-" put this into something useful!!!!
-function s:ReplaceInsertModeWithReplace()
-    if v:insertmode isnot# 'r'
-        call feedkeys("\R", "n")
+func! SetupControlsBar()
+endfunction
+
+func! LoadAnsiEsc()
+    if exists("g:loaded_AnsiEscPlugin")
+        silent! execute 'AnsiEsc'
+    else
+        finish
     endif
 endfunction
 
-"augroup ForbidInsertMode
-"    autocmd!
-"    autocmd ReplaceEnter  * call ReplaceInsertModeWithReplace()
-"    autocmd ReplaceChange * call ReplaceInsertModeWithReplace()
-"augroup END
+func! SetUpControlsBar()
+    silent! execute '5sp()'
+    set unnumber
+    set unruler
+endfunction
 
-au BufReadPre *.ans call <SID>init()
-au BufReadPost *.ans call <SID>deinit()
-au BufReadPre *.nfo call <SID>init()
-au BufReadPost *.nfo call <SID>deinit()
-au BufReadPre *.asc call <SID>init()
-au BufReadPost *.asc call <SID>deinit()
-au BufReadPre *.xbin call <SID>init()
-au BufReadPost *.xbin call <SID>deinit()
-
+func! ParseSauce()
+    "Seek to start of SAUCE (Eof-128)
+endfunction
