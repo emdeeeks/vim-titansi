@@ -4,42 +4,26 @@ if exists("g:loaded_vim-titansi") || &cp
   finish
 endif
 
-func! SetUp(...)
+func! s:init(...)
     call SetTerminalColors()
     call SetFileEncodings('cp437')
     call SetFormattingOptions()
     call LoadAnsiEsc()
     call SetUpControlsBar()
     call ParseSauce()
+
+    " need to add conditional stuff here for various file formats
+
+    " does this help?"
+    "autocmd BufWritePre * :%s/\s\+$//e
 endfunction
 
-func! TearDown(...)
+func! s:deinit(...)
     call RestoreTerminalColors()
     call RestoreFileEncodings()
 endfunction
 
-
-func! s:init(...)
-    call SetUp()
-    " need to add conditional stuff here for various file formats
-
-    " need to parse SAUCE info
-    " ref: http://www.acid.org/info/sauce/sauce.htm
-
-    " set width to 80. ditch wrapping
-
-    " does this help?"
-    autocmd BufWritePre * :%s/\s\+$//e
-endfunction
-
-func! s:deinit(...)
-    " set users terminal colors back to their originals!!!
-
-    " restore file encodings
-endfunction
-
-
-"put this into something useful!!!!
+" put this into something useful!!!!
 function s:ReplaceInsertModeWithReplace()
     if v:insertmode isnot# 'r'
         call feedkeys("\R", "n")
@@ -52,57 +36,46 @@ endfunction
 "    autocmd ReplaceChange * call ReplaceInsertModeWithReplace()
 "augroup END
 
-au BufReadPre *.ans call SetUp()
-au BufReadPost *.ans call TearDown()
+au BufReadPre *.ans call <SID>init()
+au BufReadPost *.ans call <SID>deinit()
 au BufReadPre *.nfo call <SID>init()
 au BufReadPost *.nfo call <SID>deinit()
-au BufReadPre *.asc call SetUp()
-au BufReadPost *.asc call TearDown()
+au BufReadPre *.asc call <SID>init()
+au BufReadPost *.asc call <SID>deinit()
 au BufReadPre *.xbin call <SID>init()
 au BufReadPost *.xbin call <SID>deinit()
 
 func! SetTerminalColors(...)
-    "Before setting these, they need to be saved somehow!
+    " The users current colors should be read and stored first
 
-    call system('echo \x1b]4;1;#AD0000\007') "red
-    call system('echo \x1b]4;9;#FF5255\007') "red
-    ! "\x1b]4;10;#52FF52\007"); "green
-    ! "\x1b]4;11;#FFFF52\007"); "yellow
-    ! "\x1b]4;12;#5255FF\007"); "blue
-    ! "\x1b]4;13;#FF55FF\007"); "magenta
-    ! "\x1b]4;14;#52FFFF\007"); "cyan
-    ! "\x1b]4;15;#FFFFFF\007"); "white
+    "call system('echo \x1b]4;1;#000000\007')
+    "call system('echo \x1b]4;1;#800000\007')
+    "call system('echo \x1b]4;1;#008000\007')
+    "call system('echo \x1b]4;1;#808000\007')
+    "call system('echo \x1b]4;1;#000080\007')
+    "call system('echo \x1b]4;1;#800080\007')
+    "call system('echo \x1b]4;1;#008080\007')
+    "call system('echo \x1b]4;1;#C0C0C0\007')
 
-
-    ":call system('chmod +x ' . shellescape(fname))
-
-    ":call system('chmod +x ' . shellescape())
-    silent! execute '\e]P1cc6666' "darkred
-    silent! execute '\e]P2B5BD68' "darkgreen
-    silent! execute '\e]P3F0C674' "brown
-    silent! execute '\e]P481A2BE' "darkblue
-    silent! execute '\e]P5B294BB' "darkmagenta
-    silent! execute '\e]P68ABEB7' "darkcyan
-    silent! execute '\e]P7CCCCCC' "lightgrey
-    silent! execute '\e]P8969896' "darkgrey
-    silent! execute 'x-terminal-emulator -e \e]P9cc6666' "red
-    silent! execute '\e]PAB5BD68' "green
-    silent! execute '\e]PBf0c674' "yellow
-    " echo -en "\e]PC81A2BE" #blue
-    " echo -en "\e]PDB294BB" #magenta
-    " echo -en "\e]PE8ABEB7" #cyan
-    " echo -en "\e]PFf5f5f5" #white
+    "call system('echo \x1b]4;1;#808080\007')
+    "call system('echo \x1b]4;1;#FF0000\007')
+    "call system('echo \x1b]4;1;#00FF00\007')
+    "call system('echo \x1b]4;1;#FFFF00\007')
+    "call system('echo \x1b]4;1;#0000FF\007')
+    "call system('echo \x1b]4;1;#FF00FF\007')
+    "call system('echo \x1b]4;1;#00FFFF\007')
+    "call system('echo \x1b]4;1;#FFFFFF\007')
 endfunction
 
 func! SetFormattingOptions()
     syntax off
     setlocal virtualedit=all
     hi ColorColumn ctermbg=8 guibg=8
-"    setlocal wrapmargin=2
-"    setlocal wrap
+    "setlocal wrapmargin=2
+    "setlocal wrap
     setlocal columns=80
     setlocal ambiwidth=single
-"    setlocal cc=81
+    "setlocal cc=81
     setlocal textwidth=80
     let no_plugin_maps = 1
 endfunction
@@ -120,9 +93,6 @@ function! RestoreFileEncodings()
     unlet b:myfileencodingsbak
 endfunction
 
-func! SetupControlsBar()
-endfunction
-
 func! LoadAnsiEsc()
     if exists("g:loaded_AnsiEscPlugin")
         silent! execute 'AnsiEsc'
@@ -133,10 +103,11 @@ endfunction
 
 func! SetUpControlsBar()
     silent! execute '5sp()'
-    set unnumber
-    set unruler
+    set nonumber
+    set noruler
 endfunction
 
 func! ParseSauce()
-    "Seek to start of SAUCE (Eof-128)
+    " ref: http://www.acid.org/info/sauce/sauce.htm
+    " Seek to start of SAUCE (Eof-128)
 endfunction
