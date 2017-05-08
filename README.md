@@ -1,7 +1,23 @@
 # Titansi
-## What was to be Titan's internal ascii/ansi editor.
+<p align="center">
 
-A much more fleshed out readme will come later.
+<img src="http://irokos.untergrund.net/art/ascii/2015.titansi/iks-titansi.png" />
+
+"Because having to install an app with a GUI to edit text is the dumbest fucking thing ever"
+<em>-mdx/titan</em>
+</p>
+
+## Dafuq?
+
+It's yet another ASCii/ANSi editor, but this one's different.
+
+- VIM will do the heavy-lifting with rendering, cursor movement, etc.
+- It will be able to run anywhere that can run VIM and Python. ie. Lots of platforms.
+- It'll be lightweight.
+- It'll load quick AF!
+- There'll be no Mono/.NET bloat needed.
+
+It's time to stop with the horseshit GUI editors. Titansi will be the editor that should have been created a long time ago.
 
 # License
 
