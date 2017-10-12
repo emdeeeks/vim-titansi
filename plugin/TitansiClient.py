@@ -51,7 +51,6 @@ class TitansiClient:
         # Seek to start of SAUCE (Eof-128)
 
     def setColors(self):
-        print("yup")
         #vim.command("silent !echo -en \"\e]PA98E34D\"") # green
 
     def setEncoding(self, code):
