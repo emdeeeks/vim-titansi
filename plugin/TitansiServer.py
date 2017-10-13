@@ -1,26 +1,40 @@
-import sys
-import os
 import json
 import socket
-from pprint import pprint
+import threading
 
 class TitansiServer:
     def __init__(self):
+        with open('config.json') as config_file:
+            self.config = json.load(config_file)
 
-        with open('config.json') as data_file:
-            data = json.load(data_file)
+        self.host = self.config["server"]["host"]
+        self.port = self.config["server"]["port"]
 
-        s = socket.socket()
-        s.bind((data["server"]["host"], data["server"]["port"]))
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind((self.host, self.port))
 
+    def listen(self):
+        self.sock.listen(5)
         while True:
-            s.listen(1)
-            conn, addr = s.accept()
-            print ("Connection from: " + str(addr))
-            data = conn.recv(1024).decode()
-            if not data:
-                break
-            print ("from connected  user: " + str(data))
-        conn.close()
+            self.user = self.config["user"]
+            client, address = self.sock.accept()
+            client.settimeout(60)
+            threading.Thread(target = self.listenToClient,args = (client,address)).start()
 
-TitansiServer()
+    def listenToClient(self, client, address):
+        size = 1024
+        while True:
+            try:
+                data = client.recv(size)
+                if data:
+                    response = data
+                    client.send(response)
+                else:
+                    raise error('Client disconnected')
+            except:
+                client.close()
+                return False
+
+ 
+TitansiServer().listen()
