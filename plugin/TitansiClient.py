@@ -78,4 +78,4 @@ class TitansiClient:
     def setEncoding(self, code):
         vim.command("e ++enc="+code)
 
-TitansiClient().connectToServer()
+TitansiClient()
