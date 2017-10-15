@@ -17,7 +17,7 @@ class TitansiServer:
     def listen(self):
         self.sock.listen(5)
         while True:
-            self.user = self.config["user"]
+            #self.user = self.config["user"]
             client, address = self.sock.accept()
             client.settimeout(60)
             threading.Thread(target = self.listenToClient,args = (client,address)).start()

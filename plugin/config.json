@@ -3,7 +3,9 @@
         "host": "0.0.0.0",
         "port": 6000
     },
-    "user": {
-        "handle": "mdx"
+    "network": {
+        "handle": "mdx",
+        "host": "127.0.0.1",
+        "port": 6000
     }
 }
